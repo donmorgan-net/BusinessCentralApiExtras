@@ -139,6 +139,8 @@ function Remove-BusinessCentralItemSOD{
         Write-Error "Failed to delete sales quote $Request"
     }
 }
+
+#WIP
 function Copy-BusinessCentralItemSOD{
     param(
         [Parameter(Mandatory = $true)]
