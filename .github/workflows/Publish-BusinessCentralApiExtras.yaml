@@ -15,5 +15,5 @@ jobs:
         - name: Publish
           env:
             APIKEY: ${{ secrets.POSH_GALLERY_API_KEY }}
-          run: ./.github/Publish.ps1 -TargetFolder "BusinessCentralApiExtras"
+          run: ./.github/Publish.ps1
           shell: pwsh
