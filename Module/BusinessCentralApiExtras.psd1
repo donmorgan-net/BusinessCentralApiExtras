@@ -54,7 +54,7 @@ PowerShellVersion = '7.2'
 RequiredModules = @(
     @{
         ModuleName = 'BusinessCentralApi'
-        ModuleVersion = '0.0.9'
+        ModuleVersion = '0.0.10'
     }
 )
 

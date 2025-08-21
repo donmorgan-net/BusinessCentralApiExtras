@@ -96,20 +96,12 @@ function Set-BusinessCentralItemSOD{
     #>
     param(
         [Parameter(Mandatory = $true)]
+        [string]$Id,
+        [Parameter(Mandatory = $true)]
         [object]$Parameters
     )
 
-    #Dynamically create a hashtable with whatever attributes were specified. Have to do this since you can't have a null key value in hashtables and you may not use all params when creating a new object
-    $Attributes = @{}
-    $Params = $Parameters
-    $Keys = $Parameters.Keys
-    foreach ($Key in $Keys){
-        $Attributes.Add($Key.ToLower(),$Params.$Key)
-    }
-    #Remove Id since it's not needed in the body
-    $Attributes.Remove("Id")
-
-    $Body = $Attributes | ConvertTo-Json
+    $Body = $Parameters | ConvertTo-Json
 
     $Endpoint = "/items($Id)"
 
