@@ -12,7 +12,7 @@
 # RootModule = 'BusinessCentralApiExtras.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1'
+ModuleVersion = '0.0.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -54,7 +54,7 @@ PowerShellVersion = '7.2'
 RequiredModules = @(
     @{
         ModuleName = 'BusinessCentralApi'
-        ModuleVersion = '0.0.10'
+        ModuleVersion = '0.0.9'
     }
 )
 
