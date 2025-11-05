@@ -157,13 +157,18 @@ function Get-BusinessCentralDimensionSOD{
 }
 function Get-BusinessCentralDimensionValueSOD{
     param(
-        [string]$DimensionCode
+        [string]$DimensionCode,
+        [string]$Value
+
     )
 
     $Endpoint = "/dimension_Values"
 
     #Add OData filter if a dimension code is specified
-    if($DimensionCode){
+    if($Value){
+        $Endpoint += "?`$filter=dimensioncode eq '$DimensionCode' and code eq '$Value'"
+    }
+    elseif($DimensionCode){
         $Endpoint += "?`$filter=dimensioncode eq '$DimensionCode'"
     }
 
