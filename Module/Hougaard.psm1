@@ -156,8 +156,16 @@ function Get-BusinessCentralDimensionSOD{
     Return $Req.value
 }
 function Get-BusinessCentralDimensionValueSOD{
+    param(
+        [string]$DimensionCode
+    )
+
     $Endpoint = "/dimension_Values"
 
+    #Add OData filter if a dimension code is specified
+    if($DimensionCode){
+        $Endpoint += "?`$filter=dimensioncode eq '$DimensionCode'"
+    }
 
     $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Mode ThirdPartyApi @SODApiSplat
 
