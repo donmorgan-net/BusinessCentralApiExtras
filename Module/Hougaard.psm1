@@ -11,7 +11,7 @@
         https://www.hougaard.com/designer/
 #>
 
-#Using a partial splat for specifying common parameters
+#Using a partial splat for specifying common parameters, specficially the API publisher, group, and version
 $SODApiSplat = @{
     ApiPublisher = "hougaard"
     ApiGroup = "SOD"
@@ -74,9 +74,9 @@ function New-BusinessCentralItemSOD{
 
     $Endpoint = "/items"
 
-    $Request = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Post -Body $Body -Mode ThirdPartyApi @SODApiSplat
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Post -Body $Body -Mode ThirdPartyApi @SODApiSplat
 
-    Return $Request.content | ConvertFrom-Json
+    Return $Req.content | ConvertFrom-Json
 }
 function Set-BusinessCentralItemSOD{
     <#
@@ -105,9 +105,9 @@ function Set-BusinessCentralItemSOD{
 
     $Endpoint = "/items($Id)"
 
-    $Request = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Patch -Body $Body -Mode ThirdPartyApi @SODApiSplat
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Patch -Body $Body -Mode ThirdPartyApi @SODApiSplat
 
-    Return $Request.content | ConvertFrom-Json
+    Return $Req.content | ConvertFrom-Json
 }
 function Remove-BusinessCentralItemSOD{
     <#
@@ -125,49 +125,149 @@ function Remove-BusinessCentralItemSOD{
 
     $Endpoint = "/items($Id)"
 
-    $Request = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Delete
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Delete
 
-    if($Request.StatusCode -ne '204'){
-        Write-Error "Failed to delete sales quote $Request"
+    if($Req.StatusCode -ne '204'){
+        Write-Error "Failed to delete sales quote $Req"
+    }
+}
+function Get-BusinessCentralItemReferenceSOD{
+    param(
+        [string]$CustomerNumber,
+        [string]$Filter
+    )
+
+    $Endpoint = "/Item_References"
+
+    if($Filter){
+        $Endpoint += $Filter
+    }
+
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Mode ThirdPartyApi @SODApiSplat
+
+    Return $Req.value
+}
+function Get-BusinessCentralDimensionSOD{
+
+    $Endpoint = "/dimensions"
+
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Mode ThirdPartyApi @SODApiSplat
+
+    Return $Req.value
+}
+function Get-BusinessCentralDimensionValueSOD{
+    $Endpoint = "/dimension_Values"
+
+
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Mode ThirdPartyApi @SODApiSplat
+
+    Return $Req.value
+}
+function Add-BusinessCentralDimensionValueSOD{
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$DimensionCode,
+        [Parameter(Mandatory = $true)]
+        [string]$Code,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $Endpoint = "/dimension_Values"
+
+    $Body = @{
+        dimensioncode = $DimensionCode
+        code = $Code
+        name = $Name
+    } | ConvertTo-Json
+
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Post -Body $Body -Mode ThirdPartyApi @SODApiSplat
+
+    Return ($Req.Content | ConvertFrom-Json).id
+}
+function Remove-BusinessCentralDimensionValueSOD{
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Id
+    )
+
+    $Endpoint = "/dimension_Values($Id)"
+
+    $Req = InvokeBusinessCentralApi -Endpoint $Endpoint -Method Delete -Mode ThirdPartyApi @SODApiSplat
+
+    if($Req.StatusCode -ne 204){
+        Write-Error "Error during delete request - info: $Req"
     }
 }
 
+
 #WIP
-function Copy-BusinessCentralItemSOD{
+<#
+
+function Get-BusinessCentralWarehousePickSOD{
     param(
-        [Parameter(Mandatory = $true)]
-        [string]$Id,
-        [Parameter(Mandatory = $true)]
-        [object]$Parameters
+        [string]$Id
     )
 
-    #Remove system properties like Id and read-only timestamp properties
-    $ExcludedProperties  = @(
-        'id',
-        '@odata.context',
-        '@odata.etag',
-        'lastdatetimemodified',
-        'lastdatemodified',
-        'lasttimemodified',
-        'systemid',
-        'systemcreatedat',
-        'systemcreatedby',
-        'systemmodifiedat',
-        'systemmodifiedby',
-        'assemblybom',
-        'costisadjusted',
-        'no_'
-    )
+    $Endpoint = "/warehouse_Activity_Headers"
 
-    $ItemToCopy = Get-BusinessCentralItemSOD -Id $Id | Select-Object -ExcludeProperty $ExcludedProperties
+    if($Id){
+        $Endpoint += "($Id)"
+    }
+    
+    $Req = InvokeBusinessCentralApi -Mode ThirdPartyApi -Endpoint $Endpoint @SODApiSplat
 
-    $Body = $ItemToCopy | ConvertTo-Json
+    if($Id){
+        Return $Req
+    }
+    else{
+        Return $Req.value
+    }
 
-    $Endpoint = "/items"
-
-    #$Req = 
-    InvokeBusinessCentralApi -Body $Body -Method Post -Mode ThirdPartyApi -Endpoint $Endpoint @SODApiSplat
-
-    Return $Req
 }
 
+function Get-BusinessCentralWarehouseEmployeeSOD{
+    param(
+        [string]$Id
+    )
+
+    $Endpoint = "/warehouse_Employees"
+
+    if($Id){
+        $Endpoint += "($Id)"
+    }
+    
+    $Req = InvokeBusinessCentralApi -Mode ThirdPartyApi -Endpoint $Endpoint @SODApiSplat
+
+    if($Id){
+        Return $Req
+    }
+    else{
+        Return $Req.value
+    }
+
+}
+
+function Get-BusinessCentralPictureSOD{
+    param(
+        [string]$Id
+    )
+
+    $Endpoint = "/picture_Entitys"
+
+    if($Id){
+        $Endpoint += "($Id)"
+    }
+    
+    $Req = InvokeBusinessCentralApi -Mode ThirdPartyApi -Endpoint $Endpoint @SODApiSplat
+
+    if($Id){
+        Return $Req
+    }
+    else{
+        Return $Req.value
+    }
+
+}
+
+#>
